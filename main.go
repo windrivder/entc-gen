@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"embed"
 	"flag"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -15,7 +16,7 @@ import (
 	"golang.org/x/tools/imports"
 )
 
-//go:embed template/*
+//go:embed template/*.tmpl
 var tmplPath embed.FS
 
 var configPath = flag.String("path", "./store/rdb/schema", "schema path, eg: -path store/rdb/schema")
@@ -81,7 +82,7 @@ func handler(graph *gen.Graph, path string, info os.FileInfo, err error) error {
 	// 渲染
 	for _, node := range graph.Nodes {
 		// 生成模版对象
-		data, err := os.ReadFile(path)
+		data, err := fs.ReadFile(tmplPath, path)
 		if err != nil {
 			return err
 		}
