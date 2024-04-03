@@ -1,0 +1,17 @@
+package logic
+
+var _ {{ $.Name }}Logic = (*{{ $.LowerName }}Logic)(nil)
+
+type {{ $.Name }}Logic interface {
+    gen.{{ $.Name }}Logic
+}
+
+func New{{ $.Name }}Logic() {{ $.Name }}Logic {
+	return &{{ $.LowerName }}Logic{
+		{{ $.Name }}Logic: gen.New{{ $.Name }}Logic(),
+	}
+}
+
+type {{ $.LowerName }}Logic struct {
+	gen.{{ $.Name }}Logic
+}

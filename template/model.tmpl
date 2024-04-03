@@ -1,0 +1,32 @@
+package model
+
+// {{ $.Name }}Filter initialize with New{{ $.Name }}Filter()
+type {{ $.Name }}Filter struct {
+	*{{ $.TitleName }}Filter
+	StartCreated *int64
+	EndCreated *int64
+}
+
+func ({{ $.Receiver }} *{{ $.Name }}Filter) SetStartCreated(i int64) *{{ $.Name }}Filter {
+	{{ $.Receiver }}.StartCreated = &i
+	return {{ $.Receiver }}
+}
+
+func ({{ $.Receiver }} *{{ $.Name }}Filter) SetEndCreated(i int64) *{{ $.Name }}Filter {
+	{{ $.Receiver }}.EndCreated = &i
+	return {{ $.Receiver }}
+}
+
+func ({{ $.Receiver }} *{{ $.Name }}Filter) GetFilter() []predicate.{{ $.Name }} {
+	filters := {{ $.Receiver }}.{{ $.TitleName }}Filter.GetFilter()
+
+	if {{ $.Receiver }}.StartCreated != nil {
+		filters = append(filters, {{ $.LowerName }}.CreatedGTE(*{{ $.Receiver }}.StartCreated))
+	}
+
+	if {{ $.Receiver }}.EndCreated != nil {
+		filters = append(filters, {{ $.LowerName }}.CreatedLTE(*{{ $.Receiver }}.EndCreated))
+	}
+
+	return filters
+}

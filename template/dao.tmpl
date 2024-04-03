@@ -1,0 +1,23 @@
+package dao
+
+var _ {{ $.Name }}Dao = (*{{ $.LowerName }}Dao)(nil)
+
+type (
+	{{ $.Name }}Filter = gen.{{ $.Name }}Filter
+	{{ $.Name }}Update = gen.{{ $.Name }}Update
+	{{ $.Name }}Order = gen.{{ $.Name }}Order
+)
+
+type {{ $.Name }}Dao interface {
+	gen.{{ $.Name }}Dao
+}
+
+func New{{ $.Name }}Dao() {{ $.Name }}Dao {
+	return &{{ $.LowerName }}Dao{
+		{{ $.Name }}Dao: gen.New{{ $.Name }}Dao(),
+	}
+}
+
+type {{ $.LowerName }}Dao struct {
+	gen.{{ $.Name }}Dao
+}
