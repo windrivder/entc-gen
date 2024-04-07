@@ -328,6 +328,7 @@ type {{ $.Name }}Update interface {
 	Get{{ $f.StructField }}() {{- if not $f.Type.Nillable }}*{{- end }}{{ $f.Type }}
     {{- end }}
 {{- end }}
+	GetColumns() []string
 }
 
 type {{ $.Name }}Order interface {

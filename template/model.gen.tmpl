@@ -97,6 +97,7 @@ type {{ $.Name }}Update struct {
 		{{ $f.StructField }} {{- if not $f.Type.Nillable }}*{{- end }}{{ $f.Type }} 
         {{- end }}
 	{{- end }}
+	columns []string
 }
 
 func New{{ $.Name }}Update() *{{ $.Name }}Update {
@@ -116,6 +117,18 @@ func ({{ $.Receiver }} *{{ $.Name }}Update) Get{{ $f.StructField }}() {{- if not
 }
     {{- end }}
 {{- end }}
+
+func ({{ $.Receiver }} *{{ $.Name }}Update) GetColumns() []string {
+{{- range $f := $.Fields }}
+    {{- if eq $f.StructField "Created" "Updated" }}
+    {{- else }}
+	if {{ $.Receiver }}.{{ $f.StructField }} != nil {
+		{{ $.Receiver }}.columns = append({{ $.Receiver }}.columns, {{ $.LowerName }}.Field{{ $f.StructField }})
+	}
+    {{- end }}
+{{- end }}
+	return {{ $.Receiver }}.columns
+}
 
 type {{ $.Name }}Order struct {
 	Asc   bool
