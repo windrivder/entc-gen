@@ -13,13 +13,14 @@ type {{ $.Name }} struct {
 }
 
 type {{ $.TitleName }}Filter struct {
-	ID *int64
-	IDs []int64
+	ID *int64 `json:"id"`
+	IDs []int64 `json:"ids"`
 	{{- range $f := $.Fields }}
-		{{ $f.StructField }} {{- if not $f.Type.Nillable }}*{{- end }}{{ $f.Type }} 
+		{{- $tag := $f.StructTag }}{{ with $tags := $.Annotations.Fields.StructTag }}{{ with index $tags $f.Name }}{{ $tag = . }}{{ end }}{{ end }}
+		{{ $f.StructField }} {{- if not $f.Type.Nillable }}*{{- end }}{{ $f.Type }} `{{ $tag }}`
 	{{- end }}
-	Page *int64
-	PageSize *int64
+	Page *int64 `json:"page"`
+	PageSize *int64 `json:"page_size"`
 	pointer *{{ $.Name }}Filter
 }
 
@@ -94,7 +95,8 @@ type {{ $.Name }}Update struct {
 	{{- range $f := $.Fields }}
         {{- if eq $f.StructField "Created" "Updated" }}
         {{- else }}
-		{{ $f.StructField }} {{- if not $f.Type.Nillable }}*{{- end }}{{ $f.Type }} 
+		{{- $tag := $f.StructTag }}{{ with $tags := $.Annotations.Fields.StructTag }}{{ with index $tags $f.Name }}{{ $tag = . }}{{ end }}{{ end }}
+		{{ $f.StructField }} {{- if not $f.Type.Nillable }}*{{- end }}{{ $f.Type }} `{{ $tag }}`
         {{- end }}
 	{{- end }}
 	columns []string
