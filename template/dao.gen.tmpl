@@ -32,6 +32,7 @@ type {{ $.Name }}Dao interface {
 {{- end }}
 	GetByID(ctx context.Context, id int64) (*model.{{ $.Name }}, error)
 	Get(ctx context.Context, filter {{ $.Name }}Filter) (*model.{{ $.Name }}, error)
+	ListIDs(ctx context.Context, filter {{ $.Name }}Filter) ([]int64, error)
 	ListByIDs(ctx context.Context, ids ...int64) ([]*model.{{ $.Name }}, error)
 	List(ctx context.Context, filter {{ $.Name }}Filter, orders ...{{ $.Name }}Order) ([]*model.{{ $.Name }}, error)
 	Paginate(ctx context.Context, filter {{ $.Name }}Filter, orders ...{{ $.Name }}Order) ([]*model.{{ $.Name }}, int64, error)
@@ -269,6 +270,12 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Dao) ListByIDs(ctx context.Context, ids
 		return nil, err
 	}
 	return {{ $.Receiver }}.ToModels(objs), nil
+}
+
+func ({{ $.Receiver }} *{{ $.LowerName }}Dao) ListIDs(ctx context.Context, filter {{ $.Name }}Filter) ([]int64, error) {
+	return rdb.DB(ctx).{{ $.Name }}.Query().
+		Where({filter.GetFilter()...).
+		IDs(ctx)
 }
 
 func ({{ $.Receiver }} *{{ $.LowerName }}Dao) List(ctx context.Context, filter {{ $.Name }}Filter, orders ...{{ $.Name }}Order) ([]*model.{{ $.Name }}, error) {
