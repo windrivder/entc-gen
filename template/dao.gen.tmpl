@@ -274,7 +274,7 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Dao) ListByIDs(ctx context.Context, ids
 
 func ({{ $.Receiver }} *{{ $.LowerName }}Dao) ListIDs(ctx context.Context, filter {{ $.Name }}Filter) ([]int64, error) {
 	return rdb.DB(ctx).{{ $.Name }}.Query().
-		Where({filter.GetFilter()...).
+		Where(filter.GetFilter()...).
 		IDs(ctx)
 }
 
