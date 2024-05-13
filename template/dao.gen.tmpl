@@ -45,6 +45,10 @@ func New{{ $.Name }}Dao() {{ $.Name }}Dao {
 type {{ $.LowerName }}Dao struct {}
 
 func ({{ $.Receiver }} *{{ $.LowerName }}Dao) ToModel(req *rdb.{{ $.Name }}) *model.{{ $.Name }} {
+	if req == nil {
+		return nil
+	}
+
 	obj := &model.{{ $.Name }}{
 		ID: req.ID,
     {{- range $f := $.Fields }}

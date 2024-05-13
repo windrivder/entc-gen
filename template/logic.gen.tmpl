@@ -16,7 +16,7 @@ type {{ $.Name }}Logic interface {
 	UpdateByID(ctx context.Context, id int64, req *model.{{ $.Name }}Update) (*model.{{ $.Name }}, error)
 	UpdateByIDs(ctx context.Context, ids []int64, req *model.{{ $.Name }}Update) (int64, error)
 	GetByID(ctx context.Context, id int64) (*model.{{ $.Name }}, error)
-	List(ctx context.Context, filter *model.{{ $.Name }}Filter) ([]*model.{{ $.Name }}, error)
+	List(ctx context.Context, filter *model.{{ $.Name }}Filter, orders model.{{ $.Name }}Orders) ([]*model.{{ $.Name }}, error)
 	Paginate(ctx context.Context, filter *model.{{ $.Name }}Filter, orders model.{{ $.Name }}Orders) ([]*model.{{ $.Name }}, int64, error)
 }
 
@@ -54,8 +54,8 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Logic) GetByID(ctx context.Context, id 
 	return dao.New{{ $.Name }}Dao().GetByID(ctx, id)
 }
 
-func ({{ $.Receiver }} *{{ $.LowerName }}Logic) List(ctx context.Context, filter *model.{{ $.Name }}Filter) ([]*model.{{ $.Name }}, error) {
-	return dao.New{{ $.Name }}Dao().List(ctx, filter)
+func ({{ $.Receiver }} *{{ $.LowerName }}Logic) List(ctx context.Context, filter *model.{{ $.Name }}Filter, orders model.{{ $.Name }}Orders) ([]*model.{{ $.Name }}, error) {
+	return dao.New{{ $.Name }}Dao().List(ctx, filter, orders)
 }
 
 func ({{ $.Receiver }} *{{ $.LowerName }}Logic) Paginate(ctx context.Context, filter *model.{{ $.Name }}Filter, orders model.{{ $.Name }}Orders) ([]*model.{{ $.Name }}, int64, error) {
