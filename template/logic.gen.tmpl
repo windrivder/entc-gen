@@ -19,7 +19,7 @@ type {{ $.Name }}Logic interface {
 	GetByID(ctx context.Context, id int64) (*model.{{ $.Name }}, error)
 	Exist(ctx context.Context, filter *model.{{ $.Name }}Filter) bool
 	List(ctx context.Context, filter *model.{{ $.Name }}Filter, orders ...model.{{ $.Name }}Order) ([]*model.{{ $.Name }}, error)
-	Paginate(ctx context.Context, filter *model.{{ $.Name }}Filter, orders model.{{ $.Name }}Orders) ([]*model.{{ $.Name }}, int64, error)
+	Paginate(ctx context.Context, filter *model.{{ $.Name }}Filter, orders ...model.{{ $.Name }}Order) ([]*model.{{ $.Name }}, int64, error)
 }
 
 func New{{ $.Name }}Logic() {{ $.Name }}Logic {
@@ -75,6 +75,9 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Logic) List(ctx context.Context, filter
 	return dao.New{{ $.Name }}Dao().List(ctx, filter, model.New{{ $.Name }}Orders(orders...))
 }
 
-func ({{ $.Receiver }} *{{ $.LowerName }}Logic) Paginate(ctx context.Context, filter *model.{{ $.Name }}Filter, orders model.{{ $.Name }}Orders) ([]*model.{{ $.Name }}, int64, error) {
-	return dao.New{{ $.Name }}Dao().Paginate(ctx, filter, orders)
+func ({{ $.Receiver }} *{{ $.LowerName }}Logic) Paginate(ctx context.Context, filter *model.{{ $.Name }}Filter, orders ...model.{{ $.Name }}Order) ([]*model.{{ $.Name }}, int64, error) {
+	if len(orders) == 0 {
+		orders = append(orders, model.New{{ $.Name }}Order({{ $.LowerName }}.FieldID, false))
+	}
+	return dao.New{{ $.Name }}Dao().Paginate(ctx, filter, model.New{{ $.Name }}Orders(orders...))
 }
