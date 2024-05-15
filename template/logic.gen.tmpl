@@ -15,7 +15,9 @@ type {{ $.Name }}Logic interface {
 	DeleteByIDs(ctx context.Context, ids ...int64) (int64, error)
 	UpdateByID(ctx context.Context, id int64, req *model.{{ $.Name }}Update) (*model.{{ $.Name }}, error)
 	UpdateByIDs(ctx context.Context, ids []int64, req *model.{{ $.Name }}Update) (int64, error)
+	Get(ctx context.Context, filter *model.{{ $.Name }}Filter) (*model.{{ $.Name }}, error)
 	GetByID(ctx context.Context, id int64) (*model.{{ $.Name }}, error)
+	Exist(ctx context.Context, filter *model.{{ $.Name }}Filter) bool
 	List(ctx context.Context, filter *model.{{ $.Name }}Filter, orders model.{{ $.Name }}Orders) ([]*model.{{ $.Name }}, error)
 	Paginate(ctx context.Context, filter *model.{{ $.Name }}Filter, orders model.{{ $.Name }}Orders) ([]*model.{{ $.Name }}, int64, error)
 }
@@ -48,6 +50,18 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Logic) UpdateByID(ctx context.Context, 
 
 func ({{ $.Receiver }} *{{ $.LowerName }}Logic) UpdateByIDs(ctx context.Context, ids []int64, req *model.{{ $.Name }}Update) (int64, error) {
 	return dao.New{{ $.Name }}Dao().UpdateByIDs(ctx, ids, req)
+}
+
+func ({{ $.Receiver }} *{{ $.LowerName }}Logic) Exist(ctx context.Context, filter *model.{{ $.Name }}Filter) bool {
+	exist, err := dao.New{{ $.Name }}Dao().Exist(ctx, filter)
+	if err != nil {
+		log.Error(err)
+	}
+	return exist
+}
+
+func ({{ $.Receiver }} *{{ $.LowerName }}Logic) Get(ctx context.Context, filter *model.{{ $.Name }}Filter) (*model.{{ $.Name }}, error) {
+	return dao.New{{ $.Name }}Dao().Get(ctx, filter)
 }
 
 func ({{ $.Receiver }} *{{ $.LowerName }}Logic) GetByID(ctx context.Context, id int64) (*model.{{ $.Name }}, error) {
