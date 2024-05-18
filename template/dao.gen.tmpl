@@ -21,7 +21,6 @@ type {{ $.Name }}Dao interface {
 	UpdateByID(ctx context.Context, id int64, req {{ $.Name }}Update) (*model.{{ $.Name }}, error)
 	UpdateByIDs(ctx context.Context, ids []int64, req {{ $.Name }}Update) (int64, error)
 	Update(ctx context.Context, filter {{ $.Name }}Filter, update {{ $.Name }}Update) (int64, error)
-	UpdateOneID(ctx context.Context, req *model.{{ $.Name }}, fields ...string) (*model.{{ $.Name }}, error)
 	UpdateOne(ctx context.Context, req *model.{{ $.Name }}, filter {{ $.Name }}Filter, fields ...string) (*model.{{ $.Name }}, error)
 	Exist(ctx context.Context, filter {{ $.Name }}Filter) (bool, error)
 	Count(ctx context.Context, filter {{ $.Name }}Filter) (int64, error)
@@ -187,26 +186,6 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Dao) Update(ctx context.Context, filter
     {{- end }}
 		Save(ctx)
 	return int64(count), err
-}
-
-func ({{ $.Receiver }} *{{ $.LowerName }}Dao) UpdateOneID(ctx context.Context, req *model.{{ $.Name }}, fields ...string) (*model.{{ $.Name }}, error) {
-	builder := rdb.DB(ctx).{{ $.Name }}.UpdateOneID(req.ID)
-	for _, field := range fields {
-		switch field {
-    {{- range $f := $.Fields }}
-        {{- if eq $f.StructField "Created" "Updated" }}
-        {{- else }}
-			case {{ $.LowerName }}.{{ $f.Constant }}:
-			builder.Set{{ $f.StructField }}(req.{{ $f.StructField }})
-        {{- end }}
-    {{- end }}
-		}
-	}
-	obj, err := builder.Save(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return {{ $.Receiver }}.ToModel(obj), nil
 }
 
 func ({{ $.Receiver }} *{{ $.LowerName }}Dao) UpdateOne(ctx context.Context, req *model.{{ $.Name }}, filter {{ $.Name }}Filter, fields ...string) (*model.{{ $.Name }}, error) {
