@@ -21,7 +21,7 @@ type {{ $.Name }}Dao interface {
 	UpdateByID(ctx context.Context, id int64, req {{ $.Name }}Update) (*model.{{ $.Name }}, error)
 	UpdateByIDs(ctx context.Context, ids []int64, req {{ $.Name }}Update) (int64, error)
 	Update(ctx context.Context, filter {{ $.Name }}Filter, update {{ $.Name }}Update) (int64, error)
-	UpdateOne(ctx context.Context, req *model.{{ $.Name }}, filter {{ $.Name }}Filter, fields ...string) (*model.{{ $.Name }}, error)
+	UpdateOne(ctx context.Context, req *model.{{ $.Name }}, filter {{ $.Name }}Filter, fields ...string) error
 	Exist(ctx context.Context, filter {{ $.Name }}Filter) (bool, error)
 	Count(ctx context.Context, filter {{ $.Name }}Filter) (int64, error)
 {{- range $f := $.Fields }}
@@ -188,7 +188,7 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Dao) Update(ctx context.Context, filter
 	return int64(count), err
 }
 
-func ({{ $.Receiver }} *{{ $.LowerName }}Dao) UpdateOne(ctx context.Context, req *model.{{ $.Name }}, filter {{ $.Name }}Filter, fields ...string) (*model.{{ $.Name }}, error) {
+func ({{ $.Receiver }} *{{ $.LowerName }}Dao) UpdateOne(ctx context.Context, req *model.{{ $.Name }}, filter {{ $.Name }}Filter, fields ...string) error {
 	builder := rdb.DB(ctx).{{ $.Name }}.Update().Where(filter.GetFilter()...)
 	for _, field := range fields {
 		switch field {
@@ -201,11 +201,7 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Dao) UpdateOne(ctx context.Context, req
     {{- end }}
 		}
 	}
-	_, err := builder.Save(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return {{ $.Receiver }}.Get(ctx, filter)
+	return builder.Exec(ctx)
 }
 
 func ({{ $.Receiver }} *{{ $.LowerName }}Dao) Exist(ctx context.Context, filter {{ $.Name }}Filter) (bool, error) {
