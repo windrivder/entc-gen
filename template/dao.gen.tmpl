@@ -18,7 +18,7 @@ type {{ $.Name }}Dao interface {
 	DeleteByID(ctx context.Context, id int64) error
 	DeleteByIDs(ctx context.Context, ids ...int64) (int64, error)
 	Delete(ctx context.Context, filter {{ $.Name }}Filter) (int64, error)
-	UpdateByID(ctx context.Context, id int64, req {{ $.Name }}Update) (*model.{{ $.Name }}, error)
+	UpdateByID(ctx context.Context, id int64, req {{ $.Name }}Update) error
 	UpdateByIDs(ctx context.Context, ids []int64, req {{ $.Name }}Update) (int64, error)
 	Update(ctx context.Context, filter {{ $.Name }}Filter, update {{ $.Name }}Update) (int64, error)
 	UpdateOne(ctx context.Context, req *model.{{ $.Name }}, filter {{ $.Name }}Filter, fields ...string) error
@@ -146,19 +146,15 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Dao) Delete(ctx context.Context, filter
 	return int64(count), err
 }
 
-func ({{ $.Receiver }} *{{ $.LowerName }}Dao) UpdateByID(ctx context.Context, id int64, req {{ $.Name }}Update) (*model.{{ $.Name }}, error) {
-	obj, err := rdb.DB(ctx).{{ $.Name }}.UpdateOneID(id).
+func ({{ $.Receiver }} *{{ $.LowerName }}Dao) UpdateByID(ctx context.Context, id int64, req {{ $.Name }}Update) error {
+	return rdb.DB(ctx).{{ $.Name }}.UpdateOneID(id).
     {{- range $f := $.Fields }}
         {{- if eq $f.StructField "Created" "Updated" }}
         {{- else }}
 		Set{{- if not $f.Type.Nillable }}Nillable{{- end }}{{ $f.StructField }}(req.Get{{ $f.StructField }}()).
         {{- end }}
     {{- end }}
-		Save(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return {{ $.Receiver }}.ToModel(obj), nil
+		Exec(ctx)
 }
 
 func ({{ $.Receiver }} *{{ $.LowerName }}Dao) UpdateByIDs(ctx context.Context, ids []int64, req {{ $.Name }}Update) (int64, error) {
