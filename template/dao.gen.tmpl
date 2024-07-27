@@ -214,6 +214,9 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Dao) Count(ctx context.Context, filter 
 func ({{ $.Receiver }} *{{ $.LowerName }}Dao) GetByName(ctx context.Context, name string) (*model.{{ $.Name }}, error) {
 	obj, err := rdb.DB(ctx).{{ $.Name }}.Query().Where({{ $.LowerName }}.Name(name)).{{ if $f.Unique }}Only{{ else }}First{{ end }}(ctx)
 	if err != nil {
+		if rdb.IsNotFound(err) {
+			return nil, errnos.NewNotFound()
+		}
 		return nil, err
 	}
 	return {{ $.Receiver }}.ToModel(obj), nil
@@ -224,6 +227,9 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Dao) GetByName(ctx context.Context, nam
 func ({{ $.Receiver }} *{{ $.LowerName }}Dao) GetByID(ctx context.Context, id int64) (*model.{{ $.Name }}, error) {
 	obj, err := rdb.DB(ctx).{{ $.Name }}.Get(ctx, id)
 	if err != nil {
+		if rdb.IsNotFound(err) {
+			return nil, errnos.NewNotFound()
+		}
 		return nil, err
 	}
 	return {{ $.Receiver }}.ToModel(obj), nil
@@ -232,6 +238,9 @@ func ({{ $.Receiver }} *{{ $.LowerName }}Dao) GetByID(ctx context.Context, id in
 func ({{ $.Receiver }} *{{ $.LowerName }}Dao) Get(ctx context.Context, filter {{ $.Name }}Filter) (*model.{{ $.Name }}, error) {
 	obj, err := rdb.DB(ctx).{{ $.Name }}.Query().Where(filter.GetFilter()...).Only(ctx)
 	if err != nil {
+		if rdb.IsNotFound(err) {
+			return nil, errnos.NewNotFound()
+		}
 		return nil, err
 	}
 	return {{ $.Receiver }}.ToModel(obj), nil
